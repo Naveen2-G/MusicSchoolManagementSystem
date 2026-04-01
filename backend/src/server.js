@@ -55,31 +55,31 @@ app.use("/api/chatbot", chatbotRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const start = async () => {
-  await connectDB();
+const PORT = process.env.PORT || ENV.PORT || 5000;
 
-  // Auto-create admin if not exists
-  const existingAdmin = await User.findOne({ role: ROLES.ADMIN });
-  if (!existingAdmin) {
-    console.log("No admin user found. Creating default admin...");
-    await User.create({
-      name: ENV.ADMIN_NAME,
-      email: ENV.ADMIN_EMAIL,
-      username: ENV.ADMIN_USERNAME,
-      password: ENV.ADMIN_PASSWORD,
-      role: ROLES.ADMIN,
-      isActive: true,
-      forcePasswordChange: true
+connectDB()
+  .then(async () => {
+    // Auto-create admin if not exists
+    const existingAdmin = await User.findOne({ role: ROLES.ADMIN });
+    if (!existingAdmin) {
+      console.log("No admin user found. Creating default admin...");
+      await User.create({
+        name: ENV.ADMIN_NAME,
+        email: ENV.ADMIN_EMAIL,
+        username: ENV.ADMIN_USERNAME,
+        password: ENV.ADMIN_PASSWORD,
+        role: ROLES.ADMIN,
+        isActive: true,
+        forcePasswordChange: true
+      });
+      console.log(`Admin created. Username: ${ENV.ADMIN_USERNAME}, Email: ${ENV.ADMIN_EMAIL}`);
+    }
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Server running on port ${PORT}`);
     });
-    console.log(`Admin created. Username: ${ENV.ADMIN_USERNAME}, Email: ${ENV.ADMIN_EMAIL}`);
-  }
-
-  app.listen(ENV.PORT, () => {
-    console.log(`Server running on port ${ENV.PORT}`);
+  })
+  .catch((err) => {
+    console.error("DB Error:", err);
+    process.exit(1);
   });
-};
-
-start().catch((err) => {
-  console.error("Failed to start server:", err);
-  process.exit(1);
-});
