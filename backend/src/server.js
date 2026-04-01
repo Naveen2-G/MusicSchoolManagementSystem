@@ -12,6 +12,16 @@ import chatbotRoutes from "./routes/chatbotRoutes.js";
 import { User } from "./models/User.js";
 import { ROLES } from "./utils/roles.js";
 
+process.on("uncaughtException", (err) => {
+  console.error("🔥 UNCAUGHT EXCEPTION:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("🔥 UNHANDLED PROMISE:", err);
+});
+
+console.log("🚀 Server file started...");
+
 const app = express();
 
 const allowedOrigins = ENV.CORS_ORIGINS.split(",")
