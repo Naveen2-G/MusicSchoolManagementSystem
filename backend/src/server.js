@@ -54,6 +54,10 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", env: ENV.NODE_ENV });
 });
 
+app.get("/", (req, res) => {
+  res.send("API Running ✅");
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
@@ -67,8 +71,14 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || ENV.PORT || 5000;
 
-connectDB()
-  .then(async () => {
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+const initializeDatabase = async () => {
+  try {
+    await connectDB();
+
     // Auto-create admin if not exists
     const existingAdmin = await User.findOne({ role: ROLES.ADMIN });
     if (!existingAdmin) {
@@ -85,11 +95,11 @@ connectDB()
       console.log(`Admin created. Username: ${ENV.ADMIN_USERNAME}, Email: ${ENV.ADMIN_EMAIL}`);
     }
 
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
+    console.log("✅ MongoDB connected and bootstrap completed.");
+  } catch (err) {
     console.error("DB Error:", err);
-    process.exit(1);
-  });
+    console.error("Server is still running, but database-dependent features may fail.");
+  }
+};
+
+initializeDatabase();
