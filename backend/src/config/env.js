@@ -13,6 +13,8 @@ export const ENV = {
   ADMIN_USERNAME: process.env.ADMIN_USERNAME || "admin",
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || "Admin@12345",
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
+  CORS_ORIGINS:
+    process.env.CORS_ORIGINS || "http://localhost:5173,http://127.0.0.1:5173",
   STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || "",
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || ""
 };

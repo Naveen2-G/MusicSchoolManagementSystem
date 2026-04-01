@@ -8,13 +8,34 @@ import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import teacherRoutes from "./routes/teacherRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
+import chatbotRoutes from "./routes/chatbotRoutes.js";
 import { User } from "./models/User.js";
 import { ROLES } from "./utils/roles.js";
 
 const app = express();
 
+const allowedOrigins = ENV.CORS_ORIGINS.split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin(origin, callback) {
+    // Allow non-browser clients (no Origin header), such as Postman or server-to-server calls.
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
 // Middleware
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan("dev"));
 
@@ -28,6 +49,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/teacher", teacherRoutes);
 app.use("/api/student", studentRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 
 // 404 and error handlers
 app.use(notFound);

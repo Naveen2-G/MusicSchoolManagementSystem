@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../state/AuthContext.jsx";
 import ProfileSidebar from "../ProfileSidebar.jsx";
 import ChangePassword from "../ChangePassword.jsx";
+import SchoolChatbot from "../SchoolChatbot.jsx";
 
 export const DashboardLayout = ({ role, children }) => {
   const { user, logout } = useAuth();
@@ -175,6 +176,8 @@ export const DashboardLayout = ({ role, children }) => {
         isOpen={isChangePasswordOpen}
         onClose={() => setIsChangePasswordOpen(false)}
       />
+
+      <SchoolChatbot role={role} />
     </div>
   );
 };
