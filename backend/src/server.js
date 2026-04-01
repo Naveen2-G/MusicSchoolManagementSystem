@@ -24,20 +24,32 @@ console.log("🚀 Server file started...");
 
 const app = express();
 
+const normalizeOrigin = (origin = "") => origin.trim().replace(/\/+$/, "");
+
 const allowedOrigins = ENV.CORS_ORIGINS.split(",")
   .map((origin) => origin.trim())
-  .filter(Boolean);
+  .filter(Boolean)
+  .map((origin) => normalizeOrigin(origin));
+
+if (ENV.FRONTEND_URL) {
+  const normalizedFrontendOrigin = normalizeOrigin(ENV.FRONTEND_URL);
+  if (!allowedOrigins.includes(normalizedFrontendOrigin)) {
+    allowedOrigins.push(normalizedFrontendOrigin);
+  }
+}
 
 const corsOptions = {
   origin(origin, callback) {
     // Allow non-browser clients (no Origin header), such as Postman or server-to-server calls.
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    const normalizedRequestOrigin = normalizeOrigin(origin);
+
+    if (allowedOrigins.includes(normalizedRequestOrigin)) {
       return callback(null, true);
     }
 
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
+    return callback(new Error(`CORS blocked for origin: ${normalizedRequestOrigin}`));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

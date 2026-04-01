@@ -1,16 +1,10 @@
 import axios from "axios";
 
-const deployedApiOrigin = "https://musicschoolmanagementsystembackend.onrender.com";
+export const API = (import.meta.env.VITE_API_URL || "").trim().replace(/\/+$/, "");
 
-const explicitApiOrigin = import.meta.env.VITE_API_URL?.trim();
-
-const isLocalHost =
-  typeof window !== "undefined" &&
-  ["localhost", "127.0.0.1"].includes(window.location.hostname);
-
-const fallbackOrigin = isLocalHost ? "http://localhost:5000" : deployedApiOrigin;
-
-export const API = (explicitApiOrigin || fallbackOrigin).replace(/\/+$/, "");
+if (!API) {
+  throw new Error("VITE_API_URL is required. Set it in your Vercel environment variables.");
+}
 
 const baseURL = `${API}/api`;
 
@@ -36,6 +30,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (!error.response) {
+      error.message = "Unable to reach backend API. Check VITE_API_URL and deployment status.";
+    }
+
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       window.location.href = "/login";
